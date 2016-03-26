@@ -1,0 +1,189 @@
+package cse530a;
+
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import cse530a.lab1.Main;
+
+public class ExecuteStatement {
+
+	private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+
+
+	/** begin statement */
+	/**
+	 *  1. Issuing a "begin" when auto-commit is on should temporarily set auto-commit 
+	 *  to off on the database connection. When a "commit" or "rollback" is subsequently
+	 *  entered then the transaction should be committed or rolled back and the connection 
+	 *  should have auto-commit turned back on. 
+	 *  
+	 *  2. When auto-commit is on and a "begin" has not been issued, each statement 
+	 *  is its own transcation, so a "commit" or "rollback" will have no effect. 
+	 *  However, you should output the warning "No transaction is progress".
+	 *  
+	 *  3. Issuing a "begin" when auto-commit is off should just output the warning 
+	 *  "Transaction already in progress".
+	 */
+	public static void executeBegin() {
+		/** when auto-commit is on should temporarily set auto-commit to off */
+		if(Main.autocommitStatus == true) {
+			ExecuteCommand.setAutoCommitOff();
+			/** autocommitTemp store the status */
+			Main.autocommitOffTemp = true;
+		} /** if the auto-commit is already off */
+		else {
+			System.out.println("Transaction already in progress");
+		}
+	}
+
+
+	/** commit statement */
+	/**
+	 *  1. When auto-commit is on and a "begin" has not been issued, each statement is 
+	 *  its own transcation, so a "commit" or "rollback" will have no effect. 
+	 *  However, you should output the warning "No transaction is progress".
+	 *  
+	 *  2.Issuing a "commit" or "rollback" when auto-commit is off should commit or 
+	 *  roll back the transaction. Note that this immediately opens a new transaction; 
+	 *  no "begin" is necessary.
+	 * 
+	 * */
+	public static void executeCommit() {
+		/** if  auto-commit is off */
+		if (Main.autocommitStatus == false) {
+			try {
+				/** commit the the transaction */
+				Main.conn.commit();
+				/** check whether auto-commit is temporarily disabled,
+				 *  if it is temporarily disabled, resort to the normal condition
+				 *  */
+				if(Main.autocommitOffTemp == true) {
+					ExecuteCommand.setAutoCommitOn();
+					Main.autocommitOffTemp = false;
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}	
+		} /** if auto-commit is on */ 
+		else {
+			System.out.println("No transaction is progress");
+		}
+	}
+
+
+	/** rollback statement */
+	public static void executeRollback() {
+		/** if  auto-commit is off */
+		if (Main.autocommitStatus == false) {
+			try {
+				/** commit the the transaction */
+				Main.conn.rollback();
+				/** check whether auto-commit is temporarily disabled,
+				 *  if it is temporarily disabled, resort to the normal condition
+				 *  */
+				if(Main.autocommitOffTemp == true) {
+					ExecuteCommand.setAutoCommitOn();
+					Main.autocommitOffTemp = false;
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}	
+		} /** if auto-commit is on */ 
+		else {
+			System.out.println("No transaction is progress");
+		}	
+
+	}
+
+
+	/** select statement */
+	public static void executeSelect(String sqlStatement){
+		try {
+			Statement stmt = Main.conn.createStatement();	
+			try {
+				ResultSet rs = stmt.executeQuery(sqlStatement);
+				try {
+					ResultSetMetaData metadata = rs.getMetaData(); 
+					int count = metadata.getColumnCount();
+					/** show the table header */
+					for (int i = 1; i <= count; ++i) {
+						String label = metadata.getColumnLabel(i);
+						System.out.print(label + " ");
+					}
+					System.out.println();
+					/** store the query content */
+					ArrayList<Object[]> results = new ArrayList<Object[]>();
+					while (rs.next()) 
+					{
+						Object[] row = new Object[count];
+						for (int i = 0; i < count; ++i) {
+							row[i] = rs.getObject(i+1);
+						}
+						results.add(row);
+					}
+					/** print the result of each cell */
+					int number_of_rows = results.size();
+					for (int i = 0; i < number_of_rows; ++i) {
+						Object[] row = results.get(i);
+						for (int j = 0; j < count; ++j) {
+							System.out.print(row[j]+" ");
+						}
+						System.out.println();
+					}
+					System.out.println();
+				} finally {
+					DatabaseManager.closeResultSet(rs);
+				}
+			} finally {
+				DatabaseManager.closeStatement(stmt);
+			}
+		} catch (Exception e) {
+			/** Display the error message */
+			LOGGER.log(Level.WARNING, "error", e);
+			return;
+		}
+	}
+
+
+	/** update statement */
+	public static void executeUpdate(String sqlStatement) {
+		String [] splitString = sqlStatement.split(" ");
+		Statement stmt;
+		try {
+			stmt = Main.conn.createStatement();
+			try {
+				/** do the update statement */
+				int count = stmt.executeUpdate(sqlStatement);
+				/** print the result
+				 *  there are 3 possible condition
+				 *  1. update  2. insert  3. delete
+				 * */
+				if (splitString[0].toLowerCase().equals("update")) {
+					System.out.println("UPDATE " + count);
+				}
+				else if (splitString[0].toLowerCase().equals("delete")) {
+					System.out.println("DELETE " + count);
+				}
+				else if (splitString[0].toLowerCase().equals("insert")) {
+					System.out.println("INSERT 0 " + count);
+				}
+			} catch (SQLException e) {
+				/** Display the error message */
+				LOGGER.log(Level.WARNING, "Statement error", e);
+			} finally {
+				DatabaseManager.closeStatement(stmt);
+			}
+		} catch (Exception e) {
+			/** Display the error message */
+			LOGGER.log(Level.WARNING, "error", e);
+			return;
+		}
+	}
+
+
+}

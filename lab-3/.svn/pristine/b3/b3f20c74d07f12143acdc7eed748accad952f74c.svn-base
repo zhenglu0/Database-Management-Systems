@@ -1,0 +1,46 @@
+package cse530a.model;
+
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+//FIXME Add persistence annotations to the class and getters.
+
+public class ShoppingCart implements Serializable {
+    private Long id;;
+    private Date modificationTimestamp;
+    private List<ShoppingCartItem> items;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Date getModificationTimestamp() {
+        return modificationTimestamp;
+    }
+
+    public void setModificationTimestamp(Date modificationTimestamp) {
+        this.modificationTimestamp = modificationTimestamp;
+    }
+
+    public List<ShoppingCartItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<ShoppingCartItem> items) {
+        this.items = items;
+    }
+}

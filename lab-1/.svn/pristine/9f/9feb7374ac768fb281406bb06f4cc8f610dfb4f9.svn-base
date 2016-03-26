@@ -1,0 +1,85 @@
+package cse530a.lab1;
+
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import cse530a.DatabaseManager;
+import cse530a.PropertiesLoader;
+import cse530a.Utility;
+
+/**
+ * The main class for CSE 530A lab 1.
+ */
+public class Main {
+	private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+
+	public static void main(String[] args) {
+		Logger.getLogger("").setLevel(Level.WARNING);
+
+		Properties properties = PropertiesLoader.loadProperties("database.properties");
+		if (properties == null) {
+			System.err.println("could not load properties, exiting...");
+			return;
+		}
+		// read and process in the input command
+
+		
+		DatabaseManager dbm;
+		try {
+			dbm = new DatabaseManager(properties);
+			Connection conn = dbm.getConnection();
+			Statement stmt = conn.createStatement();
+			try {
+				ResultSet rs = stmt.executeQuery("SELECT * FROM student");
+				try {
+
+					ResultSetMetaData metadata = rs.getMetaData(); 
+					int count = metadata.getColumnCount();
+					// show the table header
+					for (int i = 1; i <= count; ++i) {
+						String label = metadata.getColumnLabel(i);
+						System.out.println(label);
+					}
+					System.out.println();
+					// store the query content
+					ArrayList<Object[]> results = new ArrayList<Object[]>();
+					while (rs.next()) 
+					{
+						Object[] row = new Object[count];
+						for (int i = 0; i < count; ++i) {
+							row[i] = rs.getObject(i+1);
+						}
+						results.add(row);
+					}
+					// print the result of each cell
+					int number_of_rows = results.size();
+					for (int i = 0; i < number_of_rows; ++i) {
+						Object[] row = results.get(i);
+						for (int j = 0; j < count; ++j) {
+							System.out.print(row[j]+" ");
+						}
+						System.out.println();
+					}
+
+				} finally {
+					DatabaseManager.closeResultSet(rs);
+				}
+			} finally {
+				DatabaseManager.closeStatement(stmt);
+			}
+
+		} catch (Exception e) {
+			System.err.println("error initializing database manager");
+			LOGGER.log(Level.WARNING, "There is an error", e);
+			return;
+		}
+
+	}
+}

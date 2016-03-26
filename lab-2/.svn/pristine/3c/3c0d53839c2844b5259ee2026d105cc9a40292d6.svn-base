@@ -1,0 +1,31 @@
+package cse530a.dao;
+
+import java.sql.Connection;
+import java.util.List;
+
+import cse530a.model.Book;
+
+public class BookDao {
+    public static Book createBook(Connection conn, String isbn, String title, String author, Integer price) {
+        // FIXME
+        return null;
+    }
+    
+    public static void updateBook(Connection conn, Book book) {
+        // FIXME
+    }
+    
+    public static void deleteBook(Connection conn, Book book) {
+        // FIXME
+    }
+    
+    public static Book retrieveBook(Connection conn, String isbn) {
+        // FIXME
+        return null;
+    }
+    
+    public static List<Book> retrieveBooks(Connection conn) {
+        // FIXME
+        return null;
+    }
+}

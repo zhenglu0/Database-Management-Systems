@@ -1,0 +1,34 @@
+<!DOCTYPE hibernate-configuration PUBLIC 
+    "-//Hibernate/Hibernate Configuration DTD//EN"
+    "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+        <property name="connection.url">jdbc:postgresql://FIXME:5432/FIXME</property>
+        <property name="connection.username">FIXME</property>
+        <property name="connection.password">FIXME</property>
+
+        <property name="connection.driver_class">org.postgresql.Driver</property>
+    	<property name="dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+    	<property name="hibernate.temp.use_jdbc_metadata_defaults">false</property>
+    
+        <!-- Disable second-level cache. -->
+        <property name="cache.provider_class">org.hibernate.cache.NoCacheProvider</property>
+        <property name="cache.use_query_cache">false</property>
+        <property name="cache.use_minimal_puts">false</property>
+        <property name="max_fetch_depth">3</property>
+    
+        <!-- Print SQL to stdout. -->
+        <property name="show_sql">true</property>
+        <property name="format_sql">true</property>
+    
+        <!-- Bind the getCurrentSession() method to the thread. -->
+        <property name="current_session_context_class">thread</property>
+        
+        <mapping package="cse530a.model" />
+        <mapping class="cse530a.model.User" />
+        <mapping class="cse530a.model.Book" />
+        <mapping class="cse530a.model.ShoppingCart" />
+        <mapping class="cse530a.model.ShoppingCartItem" />
+    </session-factory>
+</hibernate-configuration>

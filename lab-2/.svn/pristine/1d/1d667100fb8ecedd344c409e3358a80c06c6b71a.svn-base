@@ -1,0 +1,25 @@
+package cse530a.dao;
+
+import java.sql.Connection;
+
+import cse530a.model.ShoppingCart;
+
+public class ShoppingCartDao {
+    public static ShoppingCart createCart(Connection conn, Long userId) {
+        // FIXME
+        return null;
+    }
+    
+    public static ShoppingCart retrieveCart(Connection conn, Long userId) {
+        // FIXME
+        return null;        
+    }
+    
+    public static void updateCart(Connection conn, ShoppingCart cart) {
+        // FIXME
+    }
+    
+    public static void deleteCart(Connection conn, ShoppingCart cart) {
+        // FIXME        
+    }
+}

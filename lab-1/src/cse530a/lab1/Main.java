@@ -1,0 +1,66 @@
+package cse530a.lab1;
+
+
+import java.sql.*;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import cse530a.DatabaseManager;
+import cse530a.PropertiesLoader;
+import cse530a.Utility;
+
+/**
+ * The main class for CSE 530A lab 1.
+ */
+public class Main {
+	
+	public static DatabaseManager dbm;
+	public static Connection conn;
+	/** autocommitStatus is used to store the the auto commit setting */
+	public static boolean autocommitStatus;
+	/** autocommitTemp is used to mark whether autocommitStatus 
+	 * is temporarily set to true or false
+	 * */
+	public static boolean autocommitOffTemp;
+	
+	private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+	
+	public static void main(String[] args) {		
+		
+		Logger.getLogger("").setLevel(Level.WARNING);
+
+		Properties properties = PropertiesLoader.loadProperties("database.properties");
+		if (properties == null) {
+			System.err.println("could not load properties, exiting...");
+			return;
+		}
+		/**
+		 * By default, your program should start with auto-commit on.
+		 */
+		autocommitStatus = true;
+		/** autocommitTemp is used to mark whether autocommitStatus 
+		 * is temporarily set to true or false
+		 * */
+		autocommitOffTemp = false;
+		/**
+		 * connect to the database
+		 */
+		try {
+			dbm = new DatabaseManager(properties);
+			conn = dbm.getConnection();
+		} catch (Exception e) {
+			System.err.println("error initializing database manager");
+			LOGGER.log(Level.WARNING, "error", e);
+			return;
+		}
+		/**
+		 * Read and process in the input command
+		 */
+		Utility.start();
+		// If the program quits, show the a sign that you quits the program
+		System.out.println("Program quits");
+		// close the connection
+		DatabaseManager.closeConnection(conn);
+	}
+}

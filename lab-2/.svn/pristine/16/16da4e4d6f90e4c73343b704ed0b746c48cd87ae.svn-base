@@ -1,0 +1,61 @@
+package cse530a.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import cse530a.model.Book;
+
+public class BookDao {
+	public static Book createBook(Connection conn, String isbn, String title, String author, Integer price) {
+		// FIXME
+		return null;
+	}
+
+	public static void updateBook(Connection conn, Book book) {
+		// FIXME
+	}
+
+	public static void deleteBook(Connection conn, Book book) {
+		// FIXME
+	}
+
+	public static Book retrieveBook(Connection conn, String isbn) {
+		// FIXME
+		return null;
+	}
+
+	private static final String RETRIEVE_BOOKS = " select isbn, title, author, price from books";
+
+	public static List<Book> retrieveBooks(Connection conn) throws SQLException {
+		List<Book> books = new ArrayList<Book>();
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+
+		try {
+			stmt = conn.prepareStatement(RETRIEVE_BOOKS);
+			rs = stmt.executeQuery();
+
+			while (rs.next()) {
+				Book book = new Book();
+				book.setIsbn(rs.getString(1));
+				book.setTitle(rs.getString(2));
+				book.setAuthor(rs.getString(3));
+				book.setPrice(rs.getInt(4));
+				/** Add the book to the list of books*/
+				books.add(book);
+			}
+			
+		} catch (SQLException e) {
+			throw e;
+		} finally {
+			DatabaseManager.closeResultSet(rs);
+			DatabaseManager.closeStatement(stmt);
+		}
+		
+		return books;
+	}
+}

@@ -1,0 +1,115 @@
+package cse530a.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import cse530a.model.Book;
+import cse530a.model.ShoppingCart;
+import cse530a.model.ShoppingCartItem;
+
+public class ShoppingCartDao {
+    public static ShoppingCart createCart(Connection conn, Long userId) {
+        // FIXME
+        return null;
+    }
+    
+    
+    private static final String REMOVE_SHOPPINGCART_WITHETEMS = " delete from shopping_cart_items where cart_id = ? and isbn = ?";
+    private static final String UPDATE_SHOPPINGCART_WITHETEMS = " update shopping_cart_items set quantity = ? where cart_id = ? and isbn = ?";
+    
+    public static void updateCart(Connection conn, Long userId, String isbn, String indicator) throws SQLException {
+    	
+    	PreparedStatement stmt = null;
+    	
+    	// if we want to remove a book form shopping cart
+    	if(indicator.equals("delete")){
+	    	try{
+	    		stmt = conn.prepareStatement(REMOVE_SHOPPINGCART_WITHETEMS);
+	    		stmt.setLong(1, userId);
+	    		stmt.setString(2, isbn);
+	    		stmt.executeUpdate();
+	    	}catch (SQLException e) {
+	            throw e;
+	        } finally {
+	            DatabaseManager.closeStatement(stmt);
+	        }
+	    	// if we want to update the quantity of the book
+    	} else if (indicator.equals("update")){
+	    	try{
+	    		// iterate through the cart
+	    		ArrayList<ShoppingCartItem> items = ShoppingCartDao.retrieveCart(conn, userId).getItems();
+	    		Iterator<ShoppingCartItem> itr = items.iterator(); 
+	    		int quantity = 0;
+	    		while(itr.hasNext()) {
+	    			
+
+	    		} 
+
+	    			    		
+	    		stmt = conn.prepareStatement(UPDATE_SHOPPINGCART_WITHETEMS);
+	    		stmt.setLong(2, userId);
+	    		stmt.setString(3, isbn);
+	    		stmt.executeUpdate();
+	    	}catch (SQLException e) {
+	            throw e;
+	        } finally {
+	            DatabaseManager.closeStatement(stmt);
+	        }
+    		// if there is no such book there previously
+    	} else if (indicator.equals("create")){
+    		
+    		
+    	}
+    	
+    }
+    
+    
+    
+    public static void deleteCart(Connection conn, ShoppingCart cart) throws SQLException {
+
+    }
+    
+    private static final String RETRIEVE_SHOPPINGCART_WITHETEMS = " select cart_id, isbn, quantity from shopping_cart_items where cart_id = ?";
+    
+    
+    public static ShoppingCart retrieveCart(Connection conn, Long userId) throws SQLException{
+    	ArrayList<ShoppingCartItem> shoppingCartItemsList = new ArrayList<ShoppingCartItem>();
+    	ShoppingCart shoppingCart = new ShoppingCart();
+    	
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            stmt = conn.prepareStatement(RETRIEVE_SHOPPINGCART_WITHETEMS);
+            stmt.setLong(1, userId);
+            rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+				ShoppingCartItem shoppingCartItem = new ShoppingCartItem();
+				// set the attribute of shopping cart items 
+				shoppingCartItem.setCartId(rs.getLong(1));
+				shoppingCartItem.setIsbn(rs.getString(2));
+				shoppingCartItem.setQuantity(rs.getInt(3));
+				// set the attribute of books of the shopping cart items
+				Book book = BookDao.retrieveBook(conn, shoppingCartItem.getIsbn());
+				shoppingCartItem.setBook(book);
+				// Add shoppingCartItem to an ArrayList
+				shoppingCartItemsList.add(shoppingCartItem);
+            }
+            // set the items found to the shopping cart
+            shoppingCart.setItems(shoppingCartItemsList); 
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            DatabaseManager.closeResultSet(rs);
+            DatabaseManager.closeStatement(stmt);
+        }
+        
+        return shoppingCart;
+    }
+    
+}

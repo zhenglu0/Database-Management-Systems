@@ -1,0 +1,38 @@
+package cse530a.dao;
+
+import java.util.List;
+
+import org.hibernate.Query;
+import org.hibernate.Session;
+
+import cse530a.model.Book;
+
+public class BookDao {
+    public static Book createBook(Session session, String isbn, String title, String author, Integer price) {
+        // FIXME
+        return null;
+    }
+    
+    public static Book retrieveBook(Session session, Long id) {
+        // FIXME
+        return null;
+    }
+
+    public static Book retrieveBook(Session session, String isbn) {
+        // FIXME
+        return null;
+    }
+
+    public static void updateBook(Session session, Book book) {
+        // FIXME
+    }
+    
+    public static void deleteBook(Session session, Book book) {
+        // FIXME
+    }
+    
+    public static List<Book> retrieveBooks(Session session) {
+        // FIXME
+        return null;
+    }
+}

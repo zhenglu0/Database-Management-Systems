@@ -1,0 +1,5 @@
+host=postgres
+port=5432
+database=DATABASE
+username=USERNAME
+password=PASSWORD

@@ -1,0 +1,120 @@
+package cse530a;
+
+
+
+import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+
+/**
+ * Holds generic utility methods that don't fit anywhere else.
+ */
+public class Utility {
+	private static final Logger LOGGER = Logger.getLogger(Utility.class.getName());
+
+	/**
+	 * Quietly closes a Closeable object.
+	 * 
+	 * @param closeable the Closeable to close
+	 */
+	public static void closeQuietly(Closeable closeable) {
+		if (closeable != null) {
+			try {
+				closeable.close();
+			} catch (IOException e) {
+				LOGGER.log(Level.WARNING, "error closing resource", e);
+			}
+		}
+	}
+
+	/**
+	 * Read and process in the input command
+	 */
+	public static void start() {
+		/** System.in std input stream already opened by default.
+		 Wrap in a new reader stream to obtain 16 bit capability.
+		 */
+		InputStreamReader reader = new InputStreamReader (System.in);
+		/** Wrap the reader with a buffered reader.*/
+		BufferedReader buf_in = new BufferedReader (reader);
+		/** Declare the string command*/
+		String command;
+		try {
+			/** Read a whole line a time. Check the string for
+			 the "\q" input to jump from the loop.
+			 */
+			while (true) {
+				/** Prompt the user to enter commands*/
+				System.out.println("Please input command:");
+				/** Read text from keyboard*/
+				command = buf_in.readLine ();
+				/** Check the break string*/
+				if(command.equals("\\q")) {
+					break;
+				}
+				/** Do the command processing*/
+				processCommand(command);
+			}
+		}
+		catch  (IOException e) {
+			System.out.println ("IO exception = " + e );
+		}			
+	}
+
+	/**
+	 * The function do the command processing
+	 */
+	public static void processCommand(String command) {
+
+		/** Check if the command is /set AUTOCOMMIT off*/
+		if(command.equals("/set AUTOCOMMIT off")) {
+			ExecuteCommand.setAutoCommitOn();
+		}
+		/** Check if the command is /set AUTOCOMMIT on*/
+		else if(command.equals("/set AUTOCOMMIT on")) {
+			ExecuteCommand.setAutoCommitOff();
+		}
+		/** Check if the command is begin */
+		else if(command.equals("begin")) {
+			ExecuteStatement.executeBegin();
+
+		}
+		/** Check if the command is commit */
+		else if(command.equals("commit")) {
+			ExecuteStatement.executeCommit();
+
+		}
+		/** Check if the command is commit */
+		else if(command.equals("rollback")) {
+			
+
+		}
+		/**If the line is not one of the commands or special SQL statements 
+		then you need to see if the line begins with "select".
+		*/
+		else{
+			/** 1. it does begin with "select" then you need to use 
+			 executeQuery() to execute it on the database.
+			 */
+			String [] splitString = command.split(" ");
+			if(splitString[0].equals("select")) {
+				/** execute select statements */
+				ExecuteStatement.executeSelect(command);
+			}
+			/** 2.  If it does not start with "select" then you should use 
+			 executeUpdate() to execute it on the database.
+			 */
+			else if (command.length() != 0) {
+				System.out.println("You are doing update");
+
+			}
+			/** 3. if the command is empty */
+			else {
+				System.out.println("No command entered");
+			}
+		}
+
+	}
+
+}

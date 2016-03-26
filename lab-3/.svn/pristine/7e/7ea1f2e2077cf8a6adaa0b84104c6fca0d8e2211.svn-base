@@ -1,0 +1,46 @@
+package cse530a.dao;
+
+import java.util.List;
+
+import org.hibernate.Query;
+import org.hibernate.Session;
+
+import cse530a.model.Book;
+
+public class BookDao {
+    public static Book createBook(Session session, String isbn, String title, String author, Integer price) {
+    	Book book = new Book();
+    	book.setIsbn(isbn);
+    	book.setTitle(title);
+    	book.setAuthor(author);
+    	book.setPrice(price);
+    	session.save(book);
+        return book;
+    }
+    
+    public static Book retrieveBook(Session session, Long id) {
+    	Query query = session.createQuery("from Book book where book.id = :id");
+    	query.setLong("id", id);
+        return (Book)query.uniqueResult();
+    }
+
+    public static Book retrieveBook(Session session, String isbn) {
+    	Query query = session.createQuery("from Book book where book.isbn = :isbn");
+    	query.setString("isbn", isbn);
+        return (Book)query.uniqueResult();
+    }
+
+    public static void updateBook(Session session, Book book) {
+    	session.save(book);
+    }
+    
+    public static void deleteBook(Session session, Book book) {
+    	session.delete(book);
+    }
+    
+    @SuppressWarnings("unchecked")
+	public static List<Book> retrieveBooks(Session session) {
+    	Query query = session.createQuery("from Book book");
+        return  query.list();
+    }
+}

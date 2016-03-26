@@ -1,0 +1,18 @@
+package cse530a.lab1;
+
+
+import cse530a.Utility;
+
+/**
+ * The main class for CSE 530A lab 1.
+ */
+public class Main {
+	public static void main(String[] args) {		
+		/**
+		 * Read and process in the input command
+		 */
+		Utility.start();
+		// If the program quits, show the a sign that you quits the program
+		System.out.println("Program quits");
+	}
+}

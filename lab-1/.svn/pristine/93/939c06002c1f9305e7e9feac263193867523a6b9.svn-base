@@ -1,0 +1,61 @@
+package cse530a;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import cse530a.lab1.Main;
+
+public class ExecuteCommand {
+	private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+
+	public static void executeSelect(String command){
+		try {
+			Statement stmt = Main.conn.createStatement();	
+			try {
+				ResultSet rs = stmt.executeQuery(command);
+				try {
+
+					ResultSetMetaData metadata = rs.getMetaData(); 
+					int count = metadata.getColumnCount();
+					// show the table header
+					for (int i = 1; i <= count; ++i) {
+						String label = metadata.getColumnLabel(i);
+						System.out.println(label);
+					}
+					System.out.println();
+					// store the query content
+					ArrayList<Object[]> results = new ArrayList<Object[]>();
+					while (rs.next()) 
+					{
+						Object[] row = new Object[count];
+						for (int i = 0; i < count; ++i) {
+							row[i] = rs.getObject(i+1);
+						}
+						results.add(row);
+					}
+					// print the result of each cell
+					int number_of_rows = results.size();
+					for (int i = 0; i < number_of_rows; ++i) {
+						Object[] row = results.get(i);
+						for (int j = 0; j < count; ++j) {
+							System.out.print(row[j]+" ");
+						}
+						System.out.println();
+					}
+					System.out.println();
+				} finally {
+					DatabaseManager.closeResultSet(rs);
+				}
+			} finally {
+				DatabaseManager.closeStatement(stmt);
+			}
+
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, "error", e);
+			return;
+		}
+
+	}
+}

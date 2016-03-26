@@ -1,0 +1,47 @@
+package cse530a.dao;
+
+import java.util.Date;
+
+import org.hibernate.Session;
+
+import cse530a.model.Book;
+import cse530a.model.ShoppingCart;
+import cse530a.model.ShoppingCartItem;
+
+public class ShoppingCartDao {
+    public static ShoppingCart createCart(Session session) {
+        // FIXME
+        return null;
+    }
+    
+    public static ShoppingCart retrieveCart(Session session, Long id) {
+        // FIXME
+        return null;
+    }
+    
+    public static void updateCart(Session session, ShoppingCart cart) {
+        // FIXME
+    }
+    
+    public static void deleteCart(Session session, ShoppingCart cart) {
+        // FIXME
+    }
+    
+    public static ShoppingCartItem createItem(Session session, ShoppingCart cart, Book book, Integer quantity) {
+        // FIXME
+        return null;
+    }
+    
+    public static ShoppingCartItem retrieveItem(Session session, Long id) {
+        // FIXME
+        return null;
+    }
+    
+    public static void updateItem(Session session, ShoppingCartItem item) {
+        // FIXME
+    }
+    
+    public static void deleteItem(Session session, ShoppingCartItem item) {
+        // FIXME
+    }
+}

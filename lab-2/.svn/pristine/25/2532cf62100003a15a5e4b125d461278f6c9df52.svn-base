@@ -1,0 +1,29 @@
+package cse530a.util;
+
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
+ * Holds generic utility methods that don't fit anywhere else.
+ */
+public class Utility {
+    private static final Logger LOGGER = Logger.getLogger(Utility.class.getName());
+
+    /**
+     * Quietly closes a Closeable object.
+     * 
+     * @param closeable the Closeable to close
+     */
+    public static void closeQuietly(Closeable closeable) {
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (IOException e) {
+                LOGGER.log(Level.WARNING, "error closing resource", e);
+            }
+        }
+    }
+}

@@ -1,0 +1,91 @@
+package cse530a.servlet;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+
+import cse530a.dao.BookDao;
+import cse530a.dao.UserDao;
+import cse530a.model.Book;
+import cse530a.model.User;
+
+/**
+ * Servlet implementation class ListBooksServlet
+ */
+@WebServlet("/list")
+public class ListBooksServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    private static final Logger LOGGER = Logger.getLogger(ListBooksServlet.class.getName());
+
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public ListBooksServlet() {
+        super();
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        process(request, response);
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        process(request, response);
+	}
+    
+    private void process(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        LOGGER.info("servlet /list");
+
+        SessionFactory sessionFactory = (SessionFactory) request.getServletContext().getAttribute("hibernateSessionFactory");
+        Session session = sessionFactory.openSession();
+        Transaction tx = null;
+        
+        try {
+            tx = session.beginTransaction();
+            
+            Long userId = (Long) request.getSession().getAttribute("userId");
+            if (userId == null) {
+                // not properly logged in
+                request.getRequestDispatcher("WEB-INF/jsp/Login.jsp").forward(request, response);
+                return;
+            }
+
+            User user = UserDao.retrieveUser(session, userId);
+            if (user == null) {
+                // not properly logged in
+                request.getRequestDispatcher("WEB-INF/jsp/Login.jsp").forward(request, response);
+                return;
+            }
+            
+			// RetrieveBooks and then put those books objects into session
+			List<Book> books = BookDao.retrieveBooks(session);
+			request.getSession().setAttribute("books", books);
+            request.getRequestDispatcher("WEB-INF/jsp/BookList.jsp").forward(request, response);
+        
+            tx.commit();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "error retrieving books", e);
+            request.getRequestDispatcher("WEB-INF/jsp/Login.jsp").forward(request, response);
+            tx.rollback();
+        } finally {
+            session.close();
+        }
+    }
+}
